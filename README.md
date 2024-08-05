@@ -7,6 +7,9 @@ System to manage generics services, to connect with others projects
 # Framework
 1. Django
 
+# Data Base
+1. Postgres
+
 # Messageria
 1. RabbitMQ
 
