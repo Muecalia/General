@@ -1,0 +1,16 @@
+django 
+djangorestframework             # (rest_framework)
+requests
+django-rest-swagger             # swagger (rest_framework_swagger)
+drf-yasg                        # Swagger generation tool (drf_yasg)
+jsonpickle
+django-cors-headers             # (corsheaders)
+uvicorn[standard]
+psycopg2                      # Conector da BD Postgres
+psycopg2-binary
+pandas
+#pyodbc                          # Auxiliar do connector de BD do SQL SERVER
+#mssql-django                    # Conector da BD DO SQL SERVER
+#mod_wsgi
+#Waitress
+#gunicorn
