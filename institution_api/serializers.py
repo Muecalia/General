@@ -28,13 +28,15 @@ class SaveInstitutionSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         error_message = message_error.ErrorMessage()        
         if Institution.objects.filter(name=attrs['name']).exists():
-            raise serializers.ValidationError(error_message.exists('name'))
-            
+            raise serializers.ValidationError(error_message.exists('name'))            
         if Institution.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError(error_message.exists('email'))
-        
+            raise serializers.ValidationError(error_message.exists('email'))        
         if Institution.objects.filter(phone=attrs['phone']).exists():
             raise serializers.ValidationError(error_message.exists('phone'))
+        if not County.objects.filter(id=attrs['county']):
+            raise serializers.ValidationError(error_message.not_found('County'))
+        if not TypeInstitution.objects.filter(id=attrs['type']):
+            raise serializers.ValidationError(error_message.not_found('Type Institution'))
         return attrs
         
     def create(self, validated_data):        
@@ -62,17 +64,13 @@ class UpdateInstitutionSerializer(serializers.ModelSerializer):
         model = Institution
         fields = ('name', 'email','phone','county','street','type')
     
-    '''def validate(self, attrs):
-        error_message = message_error.ErrorMessage()        
-        if Institution.objects.filter(name=attrs['name']).exists():
-            raise serializers.ValidationError(error_message.exists('name'))
-            
-        if Institution.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError(error_message.exists('email'))
-        
-        if Institution.objects.filter(phone=attrs['phone']).exists():
-            raise serializers.ValidationError(error_message.exists('phone'))
-        return attrs'''
+    def validate(self, attrs):
+        error_message = message_error.ErrorMessage()
+        if not County.objects.filter(id=attrs['county']):
+            raise serializers.ValidationError(error_message.not_found('County'))
+        if not TypeInstitution.objects.filter(id=attrs['type']):
+            raise serializers.ValidationError(error_message.not_found('Type Institution'))
+        return attrs
     
     def update(self, instance, validated_data):
         #county_id = validated_data['county'] if validated_data['county'] != None else 
@@ -90,54 +88,3 @@ class UpdateInstitutionSerializer(serializers.ModelSerializer):
         
         return instance
 
-
-
-
-'''class SaveProviderSerializer(serializers.Serializer):
-    institution = SaveInstitutionSerializer()
-    nif = serializers.CharField(max_length=20, allow_null=False, allow_blank=False)    
-    
-    def validate(self, attrs):
-        error_message = message_error.ErrorMessage()        
-        if Provider.objects.filter(nif=attrs['nif']).exists():
-            raise serializers.ValidationError(error_message.exists('NIF'))
-        return super().validate(attrs)
-
-    def create(self, validated_data):  
-        institutionSerializer = SaveInstitutionSerializer(data=validated_data['institution'])
-        
-        if institutionSerializer.is_valid():
-            institutionSerializer.save()
-        
-            data = {
-                'nif': validated_data['nif'],
-                'institution': Institution.objects.get(name=institutionSerializer.data['name'])
-            }
-            
-            provider = Provider.objects.create(**data)
-
-            return provider
-        
-        return None
-
-
-class ListProviderSerializer(serializers.ModelSerializer):
-    institution = serializers.SlugRelatedField(queryset=Institution.objects.all(), slug_field='name')
-    
-    class Meta:
-        model = Provider
-        fields = '__all__'
-
-class ListProviderSerializer(serializers.Serializer):
-    nif slug_field='name'
-    creation_date
-    modified_date
-    id = serializers.IntegerField()
-    institution_id
-    name = serializers.CharField(max_length=100, allow_null=False, allow_blank=False)
-    email = serializers.EmailField(max_length=100, allow_blank=True, allow_null=True)
-    phone = serializers.CharField(max_length=20, allow_blank=True, allow_null=True)
-    county = serializers.IntegerField(write_only=True)
-    street = serializers.CharField(max_length=100, allow_null=True, allow_blank=True)
-    code = serializers.CharField(max_length=10)
-    type_institution = serializers.CharField()'''

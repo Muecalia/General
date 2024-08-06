@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'address_api',
     'institution_api',
     'provider_api',
+    'agreement_api',
+    'agreement_project_api'
 ]
 
 MIDDLEWARE = [

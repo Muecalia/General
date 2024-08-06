@@ -1,22 +1,21 @@
 from rest_framework import serializers
-from .models import Provider
+from .models import Agreement
 from institution_api.models import Institution
 from institution_api.serializers import SaveInstitutionSerializer, UpdateInstitutionSerializer, ListInstitutionSerializer
 from utils import code_error, message_error
 from django.utils import timezone
 
-class SaveProviderSerializer(serializers.ModelSerializer):
+class SaveAgreementSerializer(serializers.ModelSerializer):
     institution = SaveInstitutionSerializer()
-    #nif = serializers.CharField(max_length=20, allow_null=False, allow_blank=False)
     
     class Meta:
-        model = Provider
-        fields = ['nif', 'institution']
+        model = Agreement
+        fields = ['name', 'description', 'institution']
     
     def validate(self, attrs):
         error_message = message_error.ErrorMessage()        
-        if Provider.objects.filter(nif=attrs['nif']).exists():
-            raise serializers.ValidationError(error_message.exists('NIF'))
+        if Agreement.objects.filter(name=attrs['name']).exists():
+            raise serializers.ValidationError(error_message.exists('name'))
         
         return super().validate(attrs)
 
@@ -27,30 +26,30 @@ class SaveProviderSerializer(serializers.ModelSerializer):
             institution_serializer.save()            
 
             data = {
-                'nif': validated_data['nif'],
+                'name': validated_data['name'],
+                'description': validated_data['description'],
                 'institution': Institution.objects.get(name=institution_serializer.data['name'])
             }
             
-            #provider.save()
-            provider = Provider.objects.create(**data)
-            return provider        
+            agreement = Agreement.objects.create(**data)
+            return agreement        
         return None
 
 
-class ListProviderSerializer(serializers.ModelSerializer):
+class ListAgreementSerializer(serializers.ModelSerializer):
     institution = serializers.SlugRelatedField(queryset=Institution.objects.all(), slug_field='name')
     
     class Meta:
-        model = Provider
+        model = Agreement
         fields = '__all__'
 
 
-class UpdateProviderSerializer(serializers.ModelSerializer):
+class UpdateAgreementSerializer(serializers.ModelSerializer):
     institution = UpdateInstitutionSerializer()
     
     class Meta:
-        model = Provider
-        fields = ['nif', 'institution']
+        model = Agreement
+        fields = ['name', 'description', 'institution']
     
     
     def update(self, instance, validated_data):
@@ -59,7 +58,8 @@ class UpdateProviderSerializer(serializers.ModelSerializer):
         if institution_serializer.is_valid():
             institution_serializer.save()
             
-            instance.nif = validated_data.get('nif', instance.nif)
+            instance.name = validated_data.get('name', instance.name)
+            instance.description = validated_data.get('description', instance.description)
             instance.update_date = timezone.now()
             #instance.update_date = calendar.timegm(time.gmtime())
             
@@ -67,3 +67,5 @@ class UpdateProviderSerializer(serializers.ModelSerializer):
         
             return instance
         return None
+
+

@@ -71,7 +71,6 @@ class ErrorMessage:
     def update_error_log(self, objecto: str, msn) -> str:
         return f'Erro ao actualizar os dados do {objecto}. Message: {msn}'
     
-
     
 
 
